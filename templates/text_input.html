@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Text Input</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding-top: 50px;
+        }
+
+        .navbar {
+            background-color: #007bff;
+        }
+
+        .navbar .navbar-brand {
+            color: #f8f9fa;
+        }
+
+        .navbar .nav-link {
+            color: #f8f9fa;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand" href="http://127.0.0.1:5000/">Q&A Model</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="navbar-brand" href="http://127.0.0.1:5000/">Back</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="text-center">Text Input</h1>
+        <form action="/text_input" method="POST">
+            <div class="form-group">
+                <label for="context">Context:</label>
+                <textarea class="form-control" id="context" name="context" rows="5" required>{{ text }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="question">Question:</label>
+                <input type="text" class="form-control" id="question" name="question" required value="{{ question }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+
+        {% if answer %}
+        <div class="mt-4">
+            <h5>Answer:</h5>
+            <p>{{ answer }}</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

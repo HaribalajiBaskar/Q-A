@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Q&A Model - Search</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding-top: 50px;
+        }
+
+        .navbar {
+            background-color: #007bff;
+        }
+
+        .navbar .navbar-brand {
+            color: #f8f9fa;
+        }
+
+        .navbar .nav-link {
+            color: #f8f9fa;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        /* Loader Styles */
+        .loader {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Custom Colors */
+        .green {
+            color: green;
+        }
+
+        .red {
+            color: red;
+        }
+
+        /* Remove Bullet Point */
+        #results li {
+            list-style-type: none;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand" href="http://127.0.0.1:5000/">Q&A Model</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="navbar-brand" href="http://127.0.0.1:5000/">Back</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="text-center">Q&A Model - Search</h1>
+        <div class="form-container">
+            <form id="search-form">
+                <div class="form-group">
+                    <label for="query">Search Query:</label>
+                    <input type="text" class="form-control" id="query" required>
+                </div>
+                <div class="form-group">
+                    <label for="text">Text:</label>
+                    <textarea class="form-control" id="text" rows="5"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="pdf">PDF File:</label>
+                    <input type="file" class="form-control-file" id="pdf">
+                </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+                <div class="loader" id="loader"></div> <!-- Loader element -->
+            </form>
+        </div>
+        <div class="result-container">
+            <h3>Search Results:</h3>
+            <ul id="results"></ul>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#search-form').submit(function (event) {
+                event.preventDefault();
+                var query = $('#query').val();
+                var text = $('#text').val();
+                var pdf = $('#pdf')[0].files[0];
+
+                var formData = new FormData();
+                formData.append('query', query);
+                formData.append('text', text);
+                if (pdf) {
+                    formData.append('pdf', pdf);
+                }
+
+                // Show loader when the search starts
+                $('#loader').show();
+
+                $.ajax({
+                    url: '/search',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        var results = response.results;
+                        var resultList = $('#results');
+                        resultList.empty();
+                        if (results.length > 0) {
+                            $.each(results, function (index, result) {
+                                var confidenceScore = result[1];
+                                var roundedScore = confidenceScore.toFixed(2);
+                                var colorClass = confidenceScore >= 0.5 ? 'green' : 'red';
+                                var tickOrCross = confidenceScore >= 0.5 ? '✔' : '❌';
+                                resultList.append('<li>' + tickOrCross + ' ' + result[0] + ' - Confidence Score: <span class="' + colorClass + '">' + roundedScore + '</span></li>');
+                            });
+                        } else {
+                            resultList.append('<li>No results found.</li>');
+                        }
+                    },
+                    error: function () {
+                        alert('An error occurred while processing the search request.');
+                    },
+                    complete: function () {
+                        // Hide loader when the search is complete
+                        $('#loader').hide();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
